@@ -1,0 +1,9 @@
+{
+  "variant": "baseline",
+  "model": "gpt-6-luna",
+  "reasoning": "high",
+  "sdk": "0.24.0",
+  "openai": "3.37.0",
+  "concurrency": 3,
+  "timeout_seconds": 180
+}

@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ITSM</title>
+  <link rel="stylesheet" href="/static/style.css?v=assistant-compare-1">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">IT</span>
+      <div>
+        <strong>ITSM</strong>
+        <span class="brand-subtitle">Service Operations</span>
+      </div>
+      <span id="itsm-status" class="muted"></span>
+    </div>
+    <div class="topbar-actions">
+      <button id="assistant-toggle" type="button" class="assistant-toggle" aria-controls="assistant-panel" aria-expanded="true">
+        <span id="assistant-dot" class="status-dot" aria-hidden="true"></span>
+        AI Assistant
+      </button>
+      <div class="user-switch">
+        <label for="user-select">사용자</label>
+        <select id="user-select">
+          <option value="">사용자 선택…</option>
+        </select>
+        <span id="current-user" class="current-user">세션 없음</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel tickets">
+      <div class="panel-head">
+        <h2>티켓</h2>
+        <button id="new-ticket" type="button" hidden>+ 티켓 등록</button>
+      </div>
+      <div id="agent-ticket-notice" class="agent-ticket-notice" role="status" aria-live="polite" hidden>
+        <span class="agent-ticket-notice-icon" aria-hidden="true">AI</span>
+        <div class="agent-ticket-notice-copy">
+          <strong>Agent가 티켓을 등록했습니다</strong>
+          <span id="agent-ticket-notice-id"></span>
+        </div>
+        <button id="agent-ticket-view" type="button">티켓 보기</button>
+        <button id="agent-ticket-dismiss" type="button" class="agent-ticket-dismiss" aria-label="Agent 등록 알림 닫기">×</button>
+      </div>
+      <form id="search-form" class="search">
+        <input id="search-input" type="search" placeholder="ID·제목·설명·서비스·모델 검색" autocomplete="off">
+        <select id="status-filter" aria-label="상태">
+          <option value="">전체 상태</option>
+          <option value="open">미해결 전체</option>
+          <option value="received">접수</option>
+          <option value="assigned">배정됨</option>
+          <option value="investigating">조사 중</option>
+          <option value="pending">보류</option>
+          <option value="monitoring">모니터링 중</option>
+          <option value="resolved">해결</option>
+          <option value="closed">종료</option>
+          <option value="cancelled">취소</option>
+        </select>
+        <button type="submit">검색</button>
+      </form>
+      <p id="ticket-count" class="muted"></p>
+      <ul id="ticket-list" class="ticket-list"></ul>
+      <button id="more-tickets" type="button" class="more" hidden>더 보기</button>
+    </section>
+
+    <section class="panel detail">
+      <h2 id="detail-title">상세</h2>
+      <div id="ticket-detail" class="muted">목록에서 티켓을 선택하세요.</div>
+      <form id="ticket-form" class="ticket-form" hidden novalidate>
+        <label>제목 <span class="req">*</span>
+          <input name="title" maxlength="200" required>
+        </label>
+        <label>상세 설명 <span class="req">*</span>
+          <textarea name="description" rows="4" maxlength="5000" required></textarea>
+        </label>
+        <div class="form-row">
+          <label>대상 서비스 <span class="req">*</span>
+            <select name="service_id" required></select>
+          </label>
+          <label>컴포넌트
+            <select name="component_id"></select>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>관련 모델
+            <select name="model"></select>
+          </label>
+          <label>발생 시각 <span class="req">*</span>
+            <input name="occurred_at" type="datetime-local" required>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>영향도 <span class="req">*</span>
+            <select name="impact_level" required>
+              <option value="minor">개인</option>
+              <option value="moderate" selected>단일 팀·일부 고객</option>
+              <option value="significant">다수 팀·다수 고객</option>
+              <option value="extensive">전사·전체 고객</option>
+            </select>
+          </label>
+          <label>긴급도 <span class="req">*</span>
+            <select name="urgency" required>
+              <option value="low">낮음</option>
+              <option value="medium" selected>보통 (우회 가능)</option>
+              <option value="high">높음 (주요 기능 저하)</option>
+              <option value="critical">즉시 (업무 중단)</option>
+            </select>
+          </label>
+        </div>
+        <label>영향 범위 <span class="req">*</span>
+          <textarea name="impact_note" rows="2" maxlength="1000" required></textarea>
+        </label>
+        <label class="checkbox">
+          <input name="restricted" type="checkbox"> 보안 사고로 신고 (보안관제팀만 열람)
+        </label>
+        <p class="muted small">우선순위·담당 그룹은 영향도·긴급도·서비스에 따라 ITSM이 정합니다.</p>
+        <p id="ticket-form-error" class="form-error" hidden></p>
+        <div class="form-actions">
+          <button id="ticket-form-cancel" type="button">취소</button>
+          <button id="ticket-form-submit" type="submit" class="primary">등록</button>
+        </div>
+      </form>
+    </section>
+
+    <aside id="assistant-panel" class="panel assistant-panel" aria-label="ITSM AI Assistant">
+      <div class="assistant-head">
+        <div class="assistant-title">
+          <span class="assistant-symbol" aria-hidden="true">AI</span>
+          <div>
+            <h2>ITSM Assistant</h2>
+            <p id="assistant-status" class="assistant-status">연결을 확인하는 중…</p>
+          </div>
+        </div>
+        <div class="assistant-head-actions">
+          <button id="chat-reset" type="button" class="icon-button" title="대화 초기화" aria-label="대화 초기화">↻</button>
+          <button id="assistant-close" type="button" class="icon-button" title="패널 닫기" aria-label="Assistant 패널 닫기">×</button>
+        </div>
+      </div>
+
+      <div class="assistant-comparison">
+        <div class="assistant-variants" role="group" aria-label="하네스 적용 전후 선택">
+          <button type="button" data-agent-variant="baseline" aria-pressed="true">하네스 적용 전<span>itsm_dlc</span></button>
+          <button type="button" data-agent-variant="harness" aria-pressed="false">하네스 적용 후<span>harness-1</span></button>
+        </div>
+        <p id="assistant-variant-label">적용 전 · itsm_dlc</p>
+        <p class="comparison-hint">대화는 각각 유지됩니다. 티켓 데이터는 공유됩니다.</p>
+      </div>
+
+      <div id="chat-log" class="chat-log">
+        <div id="chat-empty" class="chat-empty">
+          <div class="empty-orb" aria-hidden="true">✦</div>
+          <strong>티켓 업무를 대화로 처리하세요</strong>
+          <p>조회, 등록, 변경을 요청하면 현재 사용자의 권한으로 안전하게 실행합니다.</p>
+          <div class="prompt-chips" aria-label="추천 질문">
+            <button type="button" data-prompt="내 미해결 티켓을 보여줘">내 미해결 티켓</button>
+            <button type="button" data-prompt="INC-001 티켓 상세를 알려줘">티켓 상세 조회</button>
+            <button type="button" data-prompt="새 티켓 등록을 도와줘">새 티켓 등록</button>
+          </div>
+        </div>
+        <div id="chat-history" aria-label="대화 내역"></div>
+        <div id="chat-announcer" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+      </div>
+
+      <form id="chat-form" class="chat-form">
+        <textarea id="chat-input" rows="2" maxlength="4000" placeholder="티켓에 대해 물어보세요" aria-label="Assistant 메시지"></textarea>
+        <button id="chat-send" type="submit" class="chat-send" aria-label="메시지 전송">↑</button>
+        <p class="chat-hint">Enter 전송 · Shift+Enter 줄바꿈</p>
+      </form>
+    </aside>
+  </main>
+
+  <script src="/static/app.js?v=assistant-compare-1"></script>
+</body>
+</html>

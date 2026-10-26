@@ -1,0 +1,3 @@
+# Local test databases include short-lived delegated sessions.
+results/*/runtime/
+__pycache__/

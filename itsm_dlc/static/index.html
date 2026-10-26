@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ITSM Assistant</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <strong>ITSM Assistant</strong>
+      <span id="itsm-status" class="muted"></span>
+    </div>
+    <div class="user-switch">
+      <label for="user-select">사용자</label>
+      <select id="user-select">
+        <option value="">사용자 선택…</option>
+      </select>
+      <span id="current-user" class="current-user">세션 없음</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel chat">
+      <div class="chat-head">
+        <h2>대화</h2>
+        <button id="chat-reset" type="button" class="link">대화 초기화</button>
+      </div>
+      <p id="agent-status" class="muted"></p>
+      <div id="chat-log" class="chat-log">
+        <div id="chat-history" aria-label="이전 대화"></div>
+        <div id="chat-live" role="status" aria-live="polite" aria-relevant="additions" aria-atomic="false"></div>
+      </div>
+      <form id="chat-form" class="chat-form">
+        <textarea id="chat-input" rows="2" placeholder="메시지를 입력하세요 (Enter 전송, Shift+Enter 줄바꿈)"></textarea>
+        <button id="chat-send" type="submit">전송</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+# 비밀 정보: 실제 API 키가 들어 있는 파일은 절대 커밋하지 않습니다.
+.env.local
+.env
+.env.*
+!.env.local.example
+
+# 런타임 데이터 (scripts/reset_db.py 또는 첫 실행 시 고정 초기 데이터로 재생성)
+data/*.db
+data/*.db-*
+
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+
+# 통합 데모 전용 DB·로그
+demo/.runtime/
